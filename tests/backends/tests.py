@@ -976,22 +976,6 @@ class ThreadTests(TestCase):
         # No exception was raised
         self.assertEqual(len(exceptions), 0)
 
-    @unittest.skipIf(connection.vendor == 'sqlite' and not (sys.version_info[:2] >= (3, 4)),
-                     "Feature is only available in sqlite of >=python3.4")
-    def test_database_sharing_in_threads(self):
-        objects = []
-
-        def create_object():
-            objects.append(models.Object.objects.create())
-
-        create_object()
-
-        thread = threading.Thread(target=create_object)
-        thread.start()
-        thread.join()
-
-        self.assertEqual(len(objects), 2)
-
 
 class MySQLPKZeroTests(TestCase):
     """
@@ -1196,3 +1180,29 @@ class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
     def test_empty_settings(self):
         with override_settings(DATABASES=self.db_settings):
             self.handler.prepare_test_settings('default')
+
+
+@unittest.skipUnless(connection.vendor == 'sqlite' and sys.version_info[:2] >= (3, 4),
+                     "Feature is only available in sqlite of >=python3.4")
+class TestSqliteThreadSharing(TransactionTestCase):
+
+    _is_in_memory_db = (not settings.DATABASES['default']['TEST']['NAME']
+                        or ':memory:' in settings.DATABASES['default']['TEST']['NAME'])
+
+    available_apps = ['backends']
+
+    @unittest.skipUnless(_is_in_memory_db, "Need to test only in-memory db")
+    def test_database_sharing_in_threads(self):
+        objects = []
+
+        def create_object():
+            objects.append(models.Object.objects.create())
+
+        create_object()
+
+        for i in xrange(3):
+            thread = threading.Thread(target=create_object)
+            thread.start()
+            thread.join()
+
+        self.assertEqual(len(objects), 4)
