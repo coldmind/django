@@ -428,7 +428,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # If database is in memory, closing the connection destroys the
         # database. To prevent accidental data loss, ignore close requests on
         # an in-memory db.
-        if self.settings_dict['NAME'] != ":memory:" and not 'mode=memory' in self.settings_dict['NAME']:
+        if self.settings_dict['NAME'] != ":memory:" and not "mode=memory" in self.settings_dict['NAME']:
             BaseDatabaseWrapper.close(self)
 
     def _savepoint_allowed(self):

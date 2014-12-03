@@ -3,6 +3,7 @@ import sys
 
 from django.db.backends.creation import BaseDatabaseCreation
 from django.utils import six
+from django.utils.crypto import get_random_string
 from django.utils.six.moves import input
 
 
@@ -53,7 +54,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         if test_database_name and test_database_name != ':memory:':
             return test_database_name
         if six.PY3:
-            return 'file:memorydb?mode=memory&cache=shared'
+            return 'file:memorydb%s?mode=memory&cache=shared' % get_random_string()
         return ':memory:'
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
