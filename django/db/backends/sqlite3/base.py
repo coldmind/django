@@ -401,6 +401,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 RuntimeWarning
             )
         kwargs.update({'check_same_thread': False})
+        if six.PY3:
+            if 'mode=memory' in kwargs['database']:
+                kwargs.update({'uri': True})
         return kwargs
 
     def get_new_connection(self, conn_params):
@@ -425,7 +428,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # If database is in memory, closing the connection destroys the
         # database. To prevent accidental data loss, ignore close requests on
         # an in-memory db.
-        if self.settings_dict['NAME'] != ":memory:":
+        if self.settings_dict['NAME'] != ":memory:" and not 'mode=memory' in self.settings_dict['NAME']:
             BaseDatabaseWrapper.close(self)
 
     def _savepoint_allowed(self):

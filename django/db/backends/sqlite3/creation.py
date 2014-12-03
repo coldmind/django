@@ -2,6 +2,7 @@ import os
 import sys
 
 from django.db.backends.creation import BaseDatabaseCreation
+from django.utils import six
 from django.utils.six.moves import input
 
 
@@ -51,13 +52,15 @@ class DatabaseCreation(BaseDatabaseCreation):
         test_database_name = self.connection.settings_dict['TEST']['NAME']
         if test_database_name and test_database_name != ':memory:':
             return test_database_name
+        if six.PY3:
+            return 'file:memorydb?mode=memory&cache=shared'
         return ':memory:'
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         test_database_name = self._get_test_db_name()
         if keepdb:
             return test_database_name
-        if test_database_name != ':memory:':
+        if test_database_name != ':memory:' and 'mode=memory' not in test_database_name:
             # Erase the old test database
             if verbosity >= 1:
                 print("Destroying old test database '%s'..." % self.connection.alias)
@@ -79,7 +82,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         return test_database_name
 
     def _destroy_test_db(self, test_database_name, verbosity):
-        if test_database_name and test_database_name != ":memory:":
+        if test_database_name and (test_database_name != ":memory:" and 'mode=memory' not in test_database_name):
             # Remove the SQLite database file
             os.remove(test_database_name)
 
@@ -93,6 +96,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         """
         test_dbname = self._get_test_db_name()
         sig = [self.connection.settings_dict['NAME']]
-        if test_dbname == ':memory:':
+        if test_dbname == ':memory:' or 'mode=memory' in test_dbname:
             sig.append(self.connection.alias)
         return tuple(sig)
