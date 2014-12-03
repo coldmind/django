@@ -59,7 +59,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             return test_database_name
         # Ticket 12118 - sqlite3 with version >=3.7.13 can share in-memory database
         # between threads. Built-in sqlite module of python2 comes without
-        # ability to specify in-memory database as URI, but since python3.4 can do this,
+        # ability to specify in-memory database name as URI, but since python3.4 can do this,
         # so need to return URI to prevent fails in tests.
         if sys.version_info[:2] >= (3, 4):
             return 'file:memorydb%s?mode=memory&cache=shared' % get_random_string()
@@ -67,6 +67,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         test_database_name = self._get_test_db_name()
+
         if keepdb:
             return test_database_name
         if test_database_name != ':memory:' and 'mode=memory' not in test_database_name:

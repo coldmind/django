@@ -15,7 +15,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
-    DatabaseError, IntegrityError, reset_queries, transaction)
+    DatabaseError, IntegrityError, OperationalError, reset_queries, transaction)
 from django.db.backends import BaseDatabaseWrapper
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
@@ -1193,16 +1193,13 @@ class TestSqliteThreadSharing(TransactionTestCase):
 
     @unittest.skipUnless(_is_in_memory_db, "Need to test only in-memory db")
     def test_database_sharing_in_threads(self):
-        objects = []
-
         def create_object():
-            objects.append(models.Object.objects.create())
+            models.Object.objects.create()
 
         create_object()
 
-        for i in xrange(3):
-            thread = threading.Thread(target=create_object)
-            thread.start()
-            thread.join()
+        thread = threading.Thread(target=create_object)
+        thread.start()
+        thread.join()
 
-        self.assertEqual(len(objects), 4)
+        self.assertEqual(models.Object.objects.count(), 2)
