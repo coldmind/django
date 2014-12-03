@@ -1,8 +1,8 @@
 import os
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.creation import BaseDatabaseCreation
-from django.utils import six
 from django.utils.crypto import get_random_string
 from django.utils.six.moves import input
 
@@ -52,8 +52,16 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _get_test_db_name(self):
         test_database_name = self.connection.settings_dict['TEST']['NAME']
         if test_database_name and test_database_name != ':memory:':
+            if 'mode=memory' in test_database_name:
+                raise ImproperlyConfigured(
+                    "Using `mode=memory` parameter in the database name is not allowed, "
+                    "use `:memory:` instead.")
             return test_database_name
-        if six.PY3:
+        # Ticket 12118 - sqlite3 with version >=3.7.13 can share in-memory database
+        # between threads. Built-in sqlite module of python2 comes without
+        # ability to specify in-memory database as URI, but since python3.4 can do this,
+        # so need to return URI to prevent fails in tests.
+        if sys.version_info[:2] == (3, 4):
             return 'file:memorydb%s?mode=memory&cache=shared' % get_random_string()
         return ':memory:'
 

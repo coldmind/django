@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import re
+import sys
 import uuid
 import warnings
 
@@ -401,7 +402,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 RuntimeWarning
             )
         kwargs.update({'check_same_thread': False})
-        if six.PY3:
+        # Ticket 12118 - add `uri` parameter to
+        # support thread sharing in in-memory databases.
+        if sys.version_info[:2] == (3, 4):
             if 'mode=memory' in kwargs['database']:
                 kwargs.update({'uri': True})
         return kwargs
