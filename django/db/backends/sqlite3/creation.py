@@ -61,7 +61,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         # between threads. Built-in sqlite module of python2 comes without
         # ability to specify in-memory database as URI, but since python3.4 can do this,
         # so need to return URI to prevent fails in tests.
-        if sys.version_info[:2] == (3, 4):
+        if sys.version_info[:2] >= (3, 4):
             return 'file:memorydb%s?mode=memory&cache=shared' % get_random_string()
         return ':memory:'
 

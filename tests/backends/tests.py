@@ -6,6 +6,7 @@ import copy
 import datetime
 from decimal import Decimal
 import re
+import sys
 import threading
 import unittest
 import warnings
@@ -974,6 +975,22 @@ class ThreadTests(TestCase):
         t1.join()
         # No exception was raised
         self.assertEqual(len(exceptions), 0)
+
+    @unittest.skipIf(connection.vendor == 'sqlite' and not (sys.version_info[:2] >= (3, 4)),
+                     "Feature is only available in sqlite of >=python3.4")
+    def test_database_sharing_in_threads(self):
+        objects = []
+
+        def create_object():
+            objects.append(models.Object.objects.create())
+
+        create_object()
+
+        thread = threading.Thread(target=create_object)
+        thread.start()
+        thread.join()
+
+        self.assertEqual(len(objects), 2)
 
 
 class MySQLPKZeroTests(TestCase):

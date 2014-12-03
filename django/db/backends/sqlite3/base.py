@@ -404,7 +404,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs.update({'check_same_thread': False})
         # Ticket 12118 - add `uri` parameter to
         # support thread sharing in in-memory databases.
-        if sys.version_info[:2] == (3, 4):
+        if sys.version_info[:2] >= (3, 4):
             if 'mode=memory' in kwargs['database']:
                 kwargs.update({'uri': True})
         return kwargs
