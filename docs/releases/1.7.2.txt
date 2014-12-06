@@ -121,3 +121,6 @@ Bugfixes
   model (:ticket:`23956`).
 
 * Fixed a crash when a ``MultiValueField`` has invalid data (:ticket:`23674`).
+
+* ``makemigrations`` no longer prompts for a default value when adding
+  ``TextField()`` or ``CharField()`` without a default (:ticket:`23405`).
