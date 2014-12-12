@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.test import TestCase, mock, override_settings
+from django.test import TestCase, override_settings
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState, ModelState
@@ -1710,19 +1710,26 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0)
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition')
-    def test_add_non_blank_textfield_and_charfield(self, mocked_ask_method):
+    def test_add_non_blank_textfield_and_charfield(self):
         """
         #23405 - Adding a NOT NULL and non-blank `CharField` or `TextField`
         without default should prompt for a default.
         """
+        class CustomQuestioner(MigrationQuestioner):
+            def __init__(self):
+                super(CustomQuestioner, self).__init__()
+                self.ask_method_call_count = 0
+
+            def ask_not_null_addition(self, field_name, model_name):
+                self.ask_method_call_count += 1
+
         before = self.make_project_state([self.author_empty])
         after = self.make_project_state([self.author_with_biography_non_blank])
-        autodetector = MigrationAutodetector(before, after, MigrationQuestioner())
+        questioner_instance = CustomQuestioner()
+        autodetector = MigrationAutodetector(before, after, questioner_instance)
         changes = autodetector._detect_changes()
-        # need to check for questioner call
-        self.assertTrue(mocked_ask_method.called)
-        self.assertEqual(mocked_ask_method.call_count, 2)
+        # need to check for questioner call count
+        self.assertEqual(questioner_instance.ask_method_call_count, 2)
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0)
