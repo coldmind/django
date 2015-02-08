@@ -4,7 +4,7 @@
         "model": "postgres_tests.simpletestmodel",
         "fields": {
             "char_field": "Foo1",
-            "integer_field": 1,
+            "integer_field": 0,
             "boolean_field": true
         }
     },
@@ -13,7 +13,7 @@
         "model": "postgres_tests.simpletestmodel",
         "fields": {
             "char_field": "Foo2",
-            "integer_field": 2,
+            "integer_field": 1,
             "boolean_field": false
         }
     },
@@ -22,8 +22,17 @@
         "model": "postgres_tests.simpletestmodel",
         "fields": {
             "char_field": "Foo3",
-            "integer_field": 3,
+            "integer_field": 2,
             "boolean_field": false
+        }
+    },
+    {
+        "pk": 4,
+        "model": "postgres_tests.simpletestmodel",
+        "fields": {
+            "char_field": "Foo4",
+            "integer_field": 0,
+            "boolean_field": true
         }
     }
 ]
