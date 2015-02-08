@@ -1,7 +1,7 @@
 import unittest
 
 from django.contrib.postgres.aggregates import (
-    ArrayAgg, BitAnd, BitOr, BoolAnd,
+    ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr,
 )
 from django.db import connection
 from django.test import TestCase
@@ -73,3 +73,21 @@ class TestAggregates(TestCase):
         SimpleTestModel.objects.all().delete()
         values = SimpleTestModel.objects.all().aggregate(BitOr('integer_field'))
         self.assertEqual(values, {'integer_field__bitor': None})
+
+    def test_bool_and_general(self):
+        values = SimpleTestModel.objects.all().aggregate(BoolAnd('boolean_field'))
+        self.assertEqual(values, {'boolean_field__booland': False})
+
+    def test_bool_and_empty_result(self):
+        SimpleTestModel.objects.all().delete()
+        values = SimpleTestModel.objects.all().aggregate(BoolAnd('boolean_field'))
+        self.assertEqual(values, {'boolean_field__booland': None})
+
+    def test_bool_or_general(self):
+        values = SimpleTestModel.objects.all().aggregate(BoolOr('boolean_field'))
+        self.assertEqual(values, {'boolean_field__boolor': True})
+
+    def test_bool_or_empty_result(self):
+        SimpleTestModel.objects.all().delete()
+        values = SimpleTestModel.objects.all().aggregate(BoolOr('boolean_field'))
+        self.assertEqual(values, {'boolean_field__boolor': None})

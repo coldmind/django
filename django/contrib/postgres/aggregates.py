@@ -1,7 +1,7 @@
 from django.db.models.aggregates import Aggregate
 
 __all_ = [
-    'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd',
+    'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr',
 ]
 
 # General-purpose functions
@@ -30,3 +30,8 @@ class BitOr(Aggregate):
 class BoolAnd(Aggregate):
     function = 'BOOL_AND'
     name = 'BoolAnd'
+
+
+class BoolOr(Aggregate):
+    function = 'BOOL_OR'
+    name = 'BoolOr'
