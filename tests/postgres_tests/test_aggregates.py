@@ -1,7 +1,7 @@
 import unittest
 
 from django.contrib.postgres.aggregates import (
-    ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr,
+    ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, StringAgg,
 )
 from django.db import connection
 from django.test import TestCase
@@ -91,3 +91,16 @@ class TestAggregates(TestCase):
         SimpleTestModel.objects.all().delete()
         values = SimpleTestModel.objects.all().aggregate(BoolOr('boolean_field'))
         self.assertEqual(values, {'boolean_field__boolor': None})
+
+    def test_string_agg_requires_delimiter(self):
+        with self.assertRaises(TypeError):
+            SimpleTestModel.objects.all().aggregate(StringAgg('char_field'))
+
+    def test_string_agg_charfield(self):
+        values = SimpleTestModel.objects.all().aggregate(StringAgg('char_field', delimiter=';'))
+        self.assertEqual(values, {'char_field__stringagg': 'Foo1;Foo2;Foo3;Foo4'})
+
+    def test_string_agg_empty_result(self):
+        SimpleTestModel.objects.all().delete()
+        values = SimpleTestModel.objects.all().aggregate(StringAgg('char_field', delimiter=';'))
+        self.assertEqual(values, {'char_field__stringagg': None})
