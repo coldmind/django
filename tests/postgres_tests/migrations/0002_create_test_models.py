@@ -105,6 +105,15 @@ class Migration(migrations.Migration):
             options=None,
             bases=None,
         ),
+        migrations.CreateModel(
+            name='SimpleTestModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('char_field', models.CharField(max_length=30)),
+                ('integer_field', models.IntegerField()),
+                ('boolean_field', models.BooleanField()),
+            ]
+        ),
     ]
 
     pg_92_operations = [
