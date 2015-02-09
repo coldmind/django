@@ -3,7 +3,7 @@ import unittest
 from django.contrib.postgres.aggregates import (
     ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, CovarPop, Corr,
     RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2,
-    StringAgg,
+    RegrSlope, RegrSXX, RegrSXY, StringAgg,
 )
 from django.db import connection
 from django.test import TestCase
@@ -184,3 +184,30 @@ class TestStatisticsAggregate(TestCase):
         StatTestModel.objects.all().delete()
         values = StatTestModel.objects.all().aggregate(RegrR2(y='int2', x='int1'))
         self.assertEqual(values, {'int2_int1__regrr2': None})
+
+    def test_regr_slope_general(self):
+        values = StatTestModel.objects.all().aggregate(RegrSlope(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrslope': -1})
+
+    def test_regr_slope_empty_result(self):
+        StatTestModel.objects.all().delete()
+        values = StatTestModel.objects.all().aggregate(RegrSlope(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrslope': None})
+
+    def test_regr_sxx_general(self):
+        values = StatTestModel.objects.all().aggregate(RegrSXX(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrsxx': 2.0})
+
+    def test_regr_sxx_empty_result(self):
+        StatTestModel.objects.all().delete()
+        values = StatTestModel.objects.all().aggregate(RegrSXX(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrsxx': None})
+
+    def test_regr_sxy_general(self):
+        values = StatTestModel.objects.all().aggregate(RegrSXY(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrsxy': -2.0})
+
+    def test_regr_sxy_empty_result(self):
+        StatTestModel.objects.all().delete()
+        values = StatTestModel.objects.all().aggregate(RegrSXY(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrsxy': None})

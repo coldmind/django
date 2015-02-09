@@ -3,7 +3,7 @@ from django.db.models.aggregates import Aggregate
 
 __all_ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
-    'RegrR2',
+    'RegrR2', 'RegrSlope', 'RegrSXX', 'RegrSXY',
 ]
 
 
@@ -75,3 +75,18 @@ class RegrIntercept(StatFunc):
 class RegrR2(StatFunc):
     function = 'REGR_R2'
     name = 'RegrR2'
+
+
+class RegrSlope(StatFunc):
+    function = 'REGR_SLOPE'
+    name = 'RegrSlope'
+
+
+class RegrSXX(StatFunc):
+    function = 'REGR_SXX'
+    name = 'RegrSXX'
+
+
+class RegrSXY(StatFunc):
+    function = 'REGR_SXY'
+    name = 'RegrSXY'
