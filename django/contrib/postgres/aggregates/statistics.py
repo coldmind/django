@@ -2,7 +2,7 @@ from django.db.models import FloatField
 from django.db.models.aggregates import Aggregate
 
 __all_ = [
-    'CovarPop', 'Corr'
+    'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY',
 ]
 
 
@@ -41,3 +41,13 @@ class CovarPop(StatFunc):
     def __init__(self, x, y, sample=False):
         self.function = 'COVAR_SAMP' if sample else 'COVAR_POP'
         super(CovarPop, self).__init__(x, y)
+
+
+class RegrAvgX(StatFunc):
+    function = 'REGR_AVGX'
+    name = 'RegrAvgX'
+
+
+class RegrAvgY(StatFunc):
+    function = 'REGR_AVGY'
+    name = 'RegrAvgY'
