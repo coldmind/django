@@ -2,7 +2,7 @@ import unittest
 
 from django.contrib.postgres.aggregates import (
     ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, CovarPop, Corr,
-    RegrAvgX, RegrAvgY, StringAgg,
+    RegrAvgX, RegrAvgY, RegrCount, StringAgg,
 )
 from django.db import connection
 from django.test import TestCase
@@ -141,7 +141,7 @@ class TestStatisticsAggregate(TestCase):
 
     def test_regr_avgx_general(self):
         values = StatTestModel.objects.all().aggregate(RegrAvgX(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regravgx': 2})
+        self.assertEqual(values, {'int2_int1__regravgx': 2.0})
 
     def test_regr_avgx_empty_result(self):
         StatTestModel.objects.all().delete()
@@ -150,9 +150,18 @@ class TestStatisticsAggregate(TestCase):
 
     def test_regr_avgy_general(self):
         values = StatTestModel.objects.all().aggregate(RegrAvgY(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regravgy': 2})
+        self.assertEqual(values, {'int2_int1__regravgy': 2.0})
 
     def test_regr_avgy_empty_result(self):
         StatTestModel.objects.all().delete()
         values = StatTestModel.objects.all().aggregate(RegrAvgY(y='int2', x='int1'))
         self.assertEqual(values, {'int2_int1__regravgy': None})
+
+    def test_regr_count_general(self):
+        values = StatTestModel.objects.all().aggregate(RegrCount(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrcount': 3})
+
+    def test_regr_count_empty_result(self):
+        StatTestModel.objects.all().delete()
+        values = StatTestModel.objects.all().aggregate(RegrCount(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrcount': 0})

@@ -1,20 +1,20 @@
-from django.db.models import FloatField
+from django.db import models
 from django.db.models.aggregates import Aggregate
 
 __all_ = [
-    'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY',
+    'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount',
 ]
 
 
 class StatFunc(Aggregate):
     template = "%(function)s(%(y)s, %(x)s)"
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, output_field=models.FloatField()):
         if not x or not y:
             raise TypeError('X and Y must be explicitly provided. Example: AggrFunc(x="field1", y="field2")')
-        super(StatFunc, self).__init__(output_field=FloatField())
         self.x = x
         self.y = y
+        super(StatFunc, self).__init__(output_field=output_field)
 
     @property
     def default_alias(self):
@@ -51,3 +51,16 @@ class RegrAvgX(StatFunc):
 class RegrAvgY(StatFunc):
     function = 'REGR_AVGY'
     name = 'RegrAvgY'
+
+
+class RegrCount(StatFunc):
+    function = 'REGR_COUNT'
+    name = 'RegrCount'
+
+    def __init__(self, x, y):
+        super(RegrCount, self).__init__(x=x, y=y, output_field=models.IntegerField())
+
+    def convert_value(self, value, connection, context):
+        if value is None:
+            return 0
+        return int(value)
