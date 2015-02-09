@@ -2,7 +2,7 @@ from django.db.models import FloatField
 from django.db.models.aggregates import Aggregate
 
 __all_ = [
-    'Corr'
+    'CovarPop', 'Corr'
 ]
 
 
@@ -18,7 +18,7 @@ class StatFunc(Aggregate):
 
     @property
     def default_alias(self):
-        return '%s_%s__%s' % (self.y, self.x, self.name)
+        return '%s_%s__%s' % (self.y, self.x, self.name.lower())
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
@@ -32,4 +32,12 @@ class StatFunc(Aggregate):
 
 class Corr(StatFunc):
     function = 'CORR'
-    name = 'corr'
+    name = 'Corr'
+
+
+class CovarPop(StatFunc):
+    name = 'CovarPop'
+
+    def __init__(self, x, y, sample=False):
+        self.function = 'COVAR_SAMP' if sample else 'COVAR_POP'
+        super(CovarPop, self).__init__(x, y)

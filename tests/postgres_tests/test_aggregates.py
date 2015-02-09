@@ -1,10 +1,11 @@
 import unittest
 
 from django.contrib.postgres.aggregates import (
-    ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, StringAgg,
+    ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, CovarPop, Corr, StringAgg,
 )
 from django.db import connection
 from django.test import TestCase
+from django.test.utils import Approximate
 
 from .models import GeneralTestModel, StatTestModel
 
@@ -110,6 +111,29 @@ class TestGeneralAggregate(TestCase):
 class TestStatisticsAggregate(TestCase):
     fixtures = ["aggregation_statistics.json"]
 
-    def test_corr(self):
+    def test_corr_general(self):
         values = StatTestModel.objects.all().aggregate(Corr(y='int2', x='int1'))
         self.assertEqual(values, {'int2_int1__corr': -1.0})
+
+    def test_corr_empty_result(self):
+        StatTestModel.objects.all().delete()
+        values = StatTestModel.objects.all().aggregate(Corr(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__corr': None})
+
+    def test_covar_pop_general(self):
+        values = StatTestModel.objects.all().aggregate(CovarPop(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__covarpop': Approximate(-0.66, places=1)})
+
+    def test_covar_pop_empty_result(self):
+        StatTestModel.objects.all().delete()
+        values = StatTestModel.objects.all().aggregate(CovarPop(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__covarpop': None})
+
+    def test_covar_pop_sample(self):
+        values = StatTestModel.objects.all().aggregate(CovarPop(y='int2', x='int1', sample=True))
+        self.assertEqual(values, {'int2_int1__covarpop': -1.0})
+
+    def test_covar_pop_sample_empty_result(self):
+        StatTestModel.objects.all().delete()
+        values = StatTestModel.objects.all().aggregate(CovarPop(y='int2', x='int1', sample=True))
+        self.assertEqual(values, {'int2_int1__covarpop': None})
