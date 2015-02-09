@@ -1,7 +1,7 @@
 [
     {
         "pk": 1,
-        "model": "postgres_tests.simpletestmodel",
+        "model": "postgres_tests.generaltestmodel",
         "fields": {
             "char_field": "Foo1",
             "integer_field": 0,
@@ -10,7 +10,7 @@
     },
     {
         "pk": 2,
-        "model": "postgres_tests.simpletestmodel",
+        "model": "postgres_tests.generaltestmodel",
         "fields": {
             "char_field": "Foo2",
             "integer_field": 1,
@@ -19,7 +19,7 @@
     },
     {
         "pk": 3,
-        "model": "postgres_tests.simpletestmodel",
+        "model": "postgres_tests.generaltestmodel",
         "fields": {
             "char_field": "Foo3",
             "integer_field": 2,
@@ -28,7 +28,7 @@
     },
     {
         "pk": 4,
-        "model": "postgres_tests.simpletestmodel",
+        "model": "postgres_tests.generaltestmodel",
         "fields": {
             "char_field": "Foo4",
             "integer_field": 0,

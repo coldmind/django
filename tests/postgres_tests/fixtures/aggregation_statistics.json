@@ -1,0 +1,26 @@
+[
+    {
+        "pk": 1,
+        "model": "postgres_tests.stattestmodel",
+        "fields": {
+            "int1": 1,
+            "int2": 3
+        }
+    },
+    {
+        "pk": 2,
+        "model": "postgres_tests.stattestmodel",
+        "fields": {
+            "int1": 2,
+            "int2": 2
+        }
+    },
+    {
+        "pk": 3,
+        "model": "postgres_tests.stattestmodel",
+        "fields": {
+            "int1": 3,
+            "int2": 1
+        }
+    }
+]

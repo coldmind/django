@@ -64,10 +64,18 @@ class ArrayFieldSubclass(ArrayField):
         super(ArrayFieldSubclass, self).__init__(models.IntegerField())
 
 
-class SimpleTestModel(models.Model):
+class GeneralTestModel(models.Model):
     """
-    To test postgres-specific aggregation functions
+    To test postgres-specific general aggregation functions
     """
     char_field = models.CharField(max_length=30)
     integer_field = models.IntegerField()
     boolean_field = models.BooleanField()
+
+
+class StatTestModel(models.Model):
+    """
+    To test postgres-specific aggregation functions for statistics
+    """
+    int1 = models.IntegerField()
+    int2 = models.IntegerField()
