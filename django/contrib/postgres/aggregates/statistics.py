@@ -9,9 +9,9 @@ __all_ = [
 class StatFunc(Aggregate):
     template = "%(function)s(%(y)s, %(x)s)"
 
-    def __init__(self, x, y, output_field=models.FloatField()):
+    def __init__(self, y, x, output_field=models.FloatField()):
         if not x or not y:
-            raise TypeError('X and Y must be explicitly provided. Example: AggrFunc(x="field1", y="field2")')
+            raise TypeError('Both X and Y must be provided. Example: AggrFunc(y="field2", x="field1")')
         self.x = x
         self.y = y
         super(StatFunc, self).__init__(output_field=output_field)
@@ -38,9 +38,9 @@ class Corr(StatFunc):
 class CovarPop(StatFunc):
     name = 'CovarPop'
 
-    def __init__(self, x, y, sample=False):
+    def __init__(self, y, x, sample=False):
         self.function = 'COVAR_SAMP' if sample else 'COVAR_POP'
-        super(CovarPop, self).__init__(x, y)
+        super(CovarPop, self).__init__(y, x)
 
 
 class RegrAvgX(StatFunc):
@@ -57,8 +57,8 @@ class RegrCount(StatFunc):
     function = 'REGR_COUNT'
     name = 'RegrCount'
 
-    def __init__(self, x, y):
-        super(RegrCount, self).__init__(x=x, y=y, output_field=models.IntegerField())
+    def __init__(self, y, x):
+        super(RegrCount, self).__init__(y=y, x=x, output_field=models.IntegerField())
 
     def convert_value(self, value, connection, context):
         if value is None:
