@@ -2,7 +2,8 @@ from django.db import models
 from django.db.models.aggregates import Aggregate
 
 __all_ = [
-    'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount',
+    'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
+    'RegrR2',
 ]
 
 
@@ -64,3 +65,13 @@ class RegrCount(StatFunc):
         if value is None:
             return 0
         return int(value)
+
+
+class RegrIntercept(StatFunc):
+    function = 'REGR_INTERCEPT'
+    name = 'RegrIntercept'
+
+
+class RegrR2(StatFunc):
+    function = 'REGR_R2'
+    name = 'RegrR2'
