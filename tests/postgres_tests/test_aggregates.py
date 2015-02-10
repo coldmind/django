@@ -1,9 +1,9 @@
 import unittest
 
 from django.contrib.postgres.aggregates import (
-    ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, CovarPop, Corr,
-    RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2,
-    RegrSlope, RegrSXX, RegrSXY, StatFunc, StringAgg,
+    ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, RegrAvgX,
+    RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope, RegrSXX, RegrSXY,
+    StatFunc, StringAgg,
 )
 from django.db import connection
 from django.db.models.expressions import F, Value
