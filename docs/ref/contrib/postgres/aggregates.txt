@@ -79,11 +79,11 @@ Aggregate functions for statistics
 ``x`` and ``y``
 ~~~~~~~~~~~~~~~
 
-Both of ``x`` and ``y`` can be a field name or integer in string.
+Both of ``x`` and ``y`` can be a string with field name or integer.
 If passed argument is a field name, it will be displayed in alias
 as is.
 If passed argument is an integer, ``num`` will be displayed in
-alias this place.
+alias at this place.
 
 Example::
 
@@ -143,7 +143,7 @@ RegrCount
 
 .. class:: RegrCount(y, x)
 
-    Returns number of input rows in which both expressions are nonnull.
+    Returns number of input rows in which both expressions are not null.
 
     * Default alias: ``<y>_<x>__regrcount``
     * Return type: ``int``
