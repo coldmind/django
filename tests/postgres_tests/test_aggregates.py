@@ -111,7 +111,7 @@ class TestGeneralAggregate(TestCase):
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestStatisticsAggregate(TestCase):
-    fixtures = ["aggregation_statistics.json"]
+    fixtures = ["aggregation_general.json", "aggregation_statistics.json"]
 
     def test_corr_general(self):
         values = StatTestModel.objects.all().aggregate(Corr(y='int2', x='int1'))
@@ -211,3 +211,11 @@ class TestStatisticsAggregate(TestCase):
         StatTestModel.objects.all().delete()
         values = StatTestModel.objects.all().aggregate(RegrSXY(y='int2', x='int1'))
         self.assertEqual(values, {'int2_int1__regrsxy': None})
+
+    def test_regr_avgx_with_related_obj_and_number_as_argument(self):
+        """
+        This is more complex test to check if JOIN on field and
+        number as argument works as expected.
+        """
+        values = StatTestModel.objects.all().aggregate(RegrAvgX(y='5', x='related_field__integer_field'))
+        self.assertEqual(values, {'num_related_field__integer_field__regravgx': 1.0})

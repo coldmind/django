@@ -79,3 +79,4 @@ class StatTestModel(models.Model):
     """
     int1 = models.IntegerField()
     int2 = models.IntegerField()
+    related_field = models.ForeignKey(GeneralTestModel, null=True)

@@ -11,6 +11,7 @@ __all_ = [
 
 class StatFunc(Aggregate):
     template = "%(function)s(%(y)s, %(x)s)"
+    _num_expression_alias = 'num'
 
     def __init__(self, y, x, output_field=FloatField()):
         if not x or not y:
@@ -33,7 +34,11 @@ class StatFunc(Aggregate):
 
     @property
     def default_alias(self):
-        return '%s_%s__%s' % (self.y, self.x, self.name.lower())
+        # Since number is allowed to be an expression,
+        # we need to have kinda "static" alias for this case.
+        x = self._num_expression_alias if self.x.isdigit() else self.x
+        y = self._num_expression_alias if self.y.isdigit() else self.y
+        return '%s_%s__%s' % (y, x, self.name.lower())
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)

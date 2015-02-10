@@ -120,6 +120,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('int1', models.IntegerField()),
                 ('int2', models.IntegerField()),
+                ('related_field', models.ForeignKey('GeneralTestModel', null=True)),
             ]
         ),
     ]
