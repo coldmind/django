@@ -16,28 +16,26 @@ class StatFunc(Aggregate):
     def __init__(self, y, x, output_field=FloatField()):
         if not x or not y:
             raise TypeError('Both X and Y must be provided.')
-        if (not isinstance(x, (six.text_type, six.string_types)) or
-                not isinstance(y, (six.text_type, six.string_types))):
-            raise ValueError('X and Y must be a string.')
-        super(StatFunc, self).__init__(output_field=output_field)
+        super(StatFunc, self).__init__(y=y, x=x, output_field=output_field)
         self.x = x
         self.y = y
-        self.source_expressions = self.parse_expressions([self.x, self.y])
+        self.source_expressions = self._parse_expressions(self.x, self.y)
 
-    def parse_expressions(self, expressions):
+    def _parse_expressions(self, *expressions):
         # Some stat functions allows integer to be an argument,
         # so we need to parse it and not resolve expression as F for
         # this case.
         return [
-            Value(arg) if arg.isdigit() else F(arg) for arg in expressions
+            F(arg) if isinstance(arg, (six.string_types, six.text_type)) else Value(arg)
+            for arg in expressions
         ]
 
     @property
     def default_alias(self):
         # Since number is allowed to be an expression,
         # we need to have kinda "static" alias for this case.
-        x = self._num_expression_alias if self.x.isdigit() else self.x
-        y = self._num_expression_alias if self.y.isdigit() else self.y
+        x = self._num_expression_alias if not isinstance(self.x, (six.string_types, six.text_type)) else self.x
+        y = self._num_expression_alias if not isinstance(self.y, (six.string_types, six.text_type)) else self.y
         return '%s_%s__%s' % (y, x, self.name.lower())
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):

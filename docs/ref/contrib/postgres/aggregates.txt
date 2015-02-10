@@ -87,7 +87,7 @@ alias at this place.
 
 Example::
 
-    >> func = SomeStatFunc(y='field_name', x='13')
+    >> func = SomeStatFunc(y='field_name', x=13)
     >> print(func.default_alias)
     'field_name_num__somestatfunc'
 

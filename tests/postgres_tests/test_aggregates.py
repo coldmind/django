@@ -120,19 +120,15 @@ class TestStatisticsAggregate(TestCase):
         with self.assertRaisesMessage(TypeError, 'Both X and Y must be provided.'):
             StatFunc(x=None, y=None)
 
-    def test_non_string_argument_raises_exception(self):
-        with self.assertRaisesMessage(ValueError, 'X and Y must be a string.'):
-            StatFunc(x='test', y=123)
-
     def test_correct_source_expressions(self):
-        func = StatFunc(x='test', y='13')
+        func = StatFunc(x='test', y=13)
         self.assertTrue(isinstance(func.source_expressions[0], F))
         self.assertTrue(isinstance(func.source_expressions[1], Value))
 
     def test_correct_default_alias(self):
         class SomeFunc(StatFunc):
             name = 'TestFunc'
-        func = SomeFunc(x='foo', y='13')
+        func = SomeFunc(x='foo', y=13)
         self.assertEqual(func.default_alias, 'num_foo__testfunc')
         func = SomeFunc(x='foo', y='bar')
         self.assertEqual(func.default_alias, 'bar_foo__testfunc')
@@ -252,5 +248,5 @@ class TestStatisticsAggregate(TestCase):
         This is more complex test to check if JOIN on field and
         number as argument works as expected.
         """
-        values = StatTestModel.objects.all().aggregate(RegrAvgX(y='5', x='related_field__integer_field'))
+        values = StatTestModel.objects.all().aggregate(RegrAvgX(y=5, x='related_field__integer_field'))
         self.assertEqual(values, {'num_related_field__integer_field__regravgx': 1.0})
