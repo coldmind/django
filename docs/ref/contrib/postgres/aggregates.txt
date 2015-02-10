@@ -1,0 +1,212 @@
+PostgreSQL specific aggregation functions
+=========================================
+
+All of these functions are available from the ``django.contrib.postgres.aggregates``
+module.
+
+General-purpose aggregation functions
+-------------------------------------
+
+ArrayAgg
+~~~~~~~~
+
+.. class:: ArrayAgg(expression, **extra)
+
+    Returns input values, including nulls, concatenated into an array.
+
+    * Default alias: ``<field>__arrayagg``
+    * Return type: ``list``
+
+BitAnd
+~~~~~~
+
+.. class:: BitAnd(expression, **extra)
+
+    Returns the bitwise AND of all non-null input values, or null if none.
+
+    * Default alias: ``<field>__bitand``
+    * Return type: ``int`` or ``None``
+
+BitOr
+~~~~~
+
+.. class:: BitOr(expression, **extra)
+
+    Returns the bitwise OR of all non-null input values, or null if none.
+
+    * Default alias: ``<field>__bitor``
+    * Return type: ``int`` or ``None``
+
+BoolAnd
+~~~~~~~~
+
+.. class:: BoolAnd(expression, **extra)
+
+    Returns ``True``, if all input values are true, otherwise ``False``.
+
+    * Default alias: ``<field>__booland``
+    * Return type: ``bool`` or ``None``
+
+BoolOr
+~~~~~~
+
+.. class:: BoolOr(expression, **extra)
+
+    Returns ``True`` if at least one input value is true, otherwise ``False``.
+
+    * Default alias: ``<field>__boolor``
+    * Return type: ``bool`` or ``None``
+
+
+StringAgg
+~~~~~~~~~
+
+.. class:: String(expression, delimiter)
+
+    Returns input values concatenated into a string, separated by delimiter.
+
+    * Default alias: ``<field>__stringagg``
+    * Return type: ``str`` or ``None``
+
+    .. attribute:: delimiter
+
+        Required argument. Need to be a string. Examples: ``:``, ``;``.
+
+
+Aggregate functions for statistics
+----------------------------------
+
+``x`` and ``y``
+~~~~~~~~~~~~~~~
+
+Both of ``x`` and ``y`` can be a field name or integer in string.
+If passed argument is a field name, it will be displayed in alias
+as is.
+If passed argument is an integer, ``num`` will be displayed in
+alias this place.
+
+Example::
+
+    >> func = SomeStatFunc(y='field_name', x='13')
+    >> print(func.default_alias)
+    'field_name_num__somestatfunc'
+
+Corr
+~~~~
+
+.. class:: Corr(y, x)
+
+    Returns correlation coefficient.
+
+    * Default alias: ``<y>_<x>__corr``
+    * Return type: ``float`` or ``None``
+
+CovarPop
+~~~~~~~~
+
+.. class:: CovarPop(y, x, sample=False)
+
+    Returns population covariance.
+
+    * Default alias: ``<y>_<x>__covarpop``
+    * Return type: ``float`` or ``None``
+
+    Has one optional argument:
+
+    .. attribute:: sample
+
+        By default, ``CovarPop`` returns the general population covariance. However,
+        if ``sample=True``, the return value will be the sample population covariance.
+
+RegrAvgX
+~~~~~~~~
+
+.. class:: RegrAvgX(y, x)
+
+    Returns average of the independent variable (``sum(x)/N``).
+
+    * Default alias: ``<y>_<x>__regravgx``
+    * Return type: ``float`` or ``None``
+
+RegrAvgY
+~~~~~~~~
+
+.. class:: RegrAvgY(y, x)
+
+    Returns average of the independent variable (``sum(y)/N``).
+
+    * Default alias: ``<y>_<x>__regravgy``
+    * Return type: ``float`` or ``None``
+
+RegrCount
+~~~~~~~~~
+
+.. class:: RegrCount(y, x)
+
+    Returns number of input rows in which both expressions are nonnull.
+
+    * Default alias: ``<y>_<x>__regrcount``
+    * Return type: ``int``
+
+RegrIntercept
+~~~~~~~~~~~~~
+
+.. class:: RegrIntercept(y, x)
+
+    Returns y-intercept of the least-squares-fit linear equation determined
+    by the ``(x, y)`` pairs.
+
+    * Default alias: ``<y>_<x>__regrintercept``
+    * Return type: ``float`` or ``None``
+
+RegrR2
+~~~~~~
+
+.. class:: RegrR2(y, x)
+
+    Returns square of the correlation coefficient.
+
+    * Default alias: ``<y>_<x>__regrr2``
+    * Return type: ``float`` or ``None``
+
+RegrSlope
+~~~~~~~~~
+
+.. class:: RegrSlope(y, x)
+
+    Returns slope of the least-squares-fit linear equation determined
+    by the ``(x, y)`` pairs.
+
+    * Default alias: ``<y>_<x>__regrslope``
+    * Return type: ``float`` or ``None``
+
+RegrSXX
+~~~~~~~
+
+.. class:: RegrSXX(y, x)
+
+    Returns ``sum(x^2) - sum(x)^2/N`` ("sum of squares" of the independent variable).
+
+    * Default alias: ``<y>_<x>__regrsxx``
+    * Return type: ``float`` or ``None``
+
+RegrSXY
+~~~~~~~
+
+.. class:: RegrSXY(y, x)
+
+    Returns ``sum(x*y) - sum(x) * sum(y)/N`` ("sum of products" of independent
+    times dependent variable).
+
+    * Default alias: ``<y>_<x>__regrsxy``
+    * Return type: ``float`` or ``None``
+
+RegrSYY
+~~~~~~~
+
+.. class:: RegrSYY(y, x)
+
+    Returns ``sum(y^2) - sum(y)^2/N`` ("sum of squares" of the dependent variable).
+
+    * Default alias: ``<y>_<x>__regrsyy``
+    * Return type: ``float`` or ``None``
