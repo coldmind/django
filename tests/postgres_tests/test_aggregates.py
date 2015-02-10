@@ -3,7 +3,7 @@ import unittest
 from django.contrib.postgres.aggregates import (
     ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, RegrAvgX,
     RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope, RegrSXX, RegrSXY,
-    StatFunc, StringAgg,
+    RegrSYY, StatFunc, StringAgg,
 )
 from django.db import connection
 from django.db.models.expressions import F, Value
@@ -237,6 +237,15 @@ class TestStatisticsAggregate(TestCase):
         StatTestModel.objects.all().delete()
         values = StatTestModel.objects.all().aggregate(RegrSXY(y='int2', x='int1'))
         self.assertEqual(values, {'int2_int1__regrsxy': None})
+
+    def test_regr_syy_general(self):
+        values = StatTestModel.objects.all().aggregate(RegrSYY(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrsyy': 2.0})
+
+    def test_regr_syy_empty_result(self):
+        StatTestModel.objects.all().delete()
+        values = StatTestModel.objects.all().aggregate(RegrSYY(y='int2', x='int1'))
+        self.assertEqual(values, {'int2_int1__regrsyy': None})
 
     def test_regr_avgx_with_related_obj_and_number_as_argument(self):
         """

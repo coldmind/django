@@ -5,7 +5,7 @@ from django.utils import six
 
 __all_ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
-    'RegrR2', 'RegrSlope', 'RegrSXX', 'RegrSXY',
+    'RegrR2', 'RegrSlope', 'RegrSXX', 'RegrSXY', 'RegrSYY',
 ]
 
 
@@ -113,3 +113,8 @@ class RegrSXX(StatFunc):
 class RegrSXY(StatFunc):
     function = 'REGR_SXY'
     name = 'RegrSXY'
+
+
+class RegrSYY(StatFunc):
+    function = 'REGR_SYY'
+    name = 'RegrSYY'
