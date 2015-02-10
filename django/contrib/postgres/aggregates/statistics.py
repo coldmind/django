@@ -39,10 +39,14 @@ class StatFunc(Aggregate):
         return super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
 
     def as_sql(self, compiler, connection, function=None, template=None):
-        template = self.extra.get('template', self.template)
-        mapping = {'function': self.function, 'y': self.y, 'x': self.x}
-        # template, params
-        return template % mapping, []
+        sql_parts = []
+        params = []
+        for arg in self.source_expressions:
+            arg_sql, arg_params = compiler.compile(arg)
+            sql_parts.append(arg_sql)
+            params.extend(arg_params)
+        mapping = {'function': self.function, 'y': sql_parts[1], 'x': sql_parts[0]}
+        return self.template % mapping, params
 
 
 class Corr(StatFunc):
