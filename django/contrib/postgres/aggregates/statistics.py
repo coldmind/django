@@ -1,5 +1,7 @@
-from django.db import models
+from django.db.models import F, FloatField, IntegerField
 from django.db.models.aggregates import Aggregate
+from django.db.models.expressions import Value
+from django.utils import six
 
 __all_ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
@@ -10,12 +12,24 @@ __all_ = [
 class StatFunc(Aggregate):
     template = "%(function)s(%(y)s, %(x)s)"
 
-    def __init__(self, y, x, output_field=models.FloatField()):
+    def __init__(self, y, x, output_field=FloatField()):
         if not x or not y:
             raise TypeError('Both X and Y must be provided. Example: AggrFunc(y="field2", x="field1")')
+        if (not isinstance(x, (six.text_type, six.string_types)) or
+                not isinstance(y, (six.text_type, six.string_types))):
+            raise ValueError('X and Y must be a string.')
+        super(StatFunc, self).__init__(output_field=output_field)
         self.x = x
         self.y = y
-        super(StatFunc, self).__init__(output_field=output_field)
+        self.source_expressions = self.parse_expressions([self.x, self.y])
+
+    def parse_expressions(self, expressions):
+        # Some stat functions allows integer to be an argument,
+        # so we need to parse it and not resolve expression as F for
+        # this case.
+        return [
+            Value(arg) if arg.isdigit() else F(arg) for arg in expressions
+        ]
 
     @property
     def default_alias(self):
@@ -27,7 +41,7 @@ class StatFunc(Aggregate):
     def as_sql(self, compiler, connection, function=None, template=None):
         template = self.extra.get('template', self.template)
         mapping = {'function': self.function, 'y': self.y, 'x': self.x}
-        # mapping, params
+        # template, params
         return template % mapping, []
 
 
@@ -59,7 +73,7 @@ class RegrCount(StatFunc):
     name = 'RegrCount'
 
     def __init__(self, y, x):
-        super(RegrCount, self).__init__(y=y, x=x, output_field=models.IntegerField())
+        super(RegrCount, self).__init__(y=y, x=x, output_field=IntegerField())
 
     def convert_value(self, value, connection, context):
         if value is None:
