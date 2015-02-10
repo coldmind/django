@@ -15,7 +15,7 @@ class StatFunc(Aggregate):
 
     def __init__(self, y, x, output_field=FloatField()):
         if not x or not y:
-            raise TypeError('Both X and Y must be provided. Example: AggrFunc(y="field2", x="field1")')
+            raise TypeError('Both X and Y must be provided.')
         if (not isinstance(x, (six.text_type, six.string_types)) or
                 not isinstance(y, (six.text_type, six.string_types))):
             raise ValueError('X and Y must be a string.')

@@ -3,9 +3,10 @@ import unittest
 from django.contrib.postgres.aggregates import (
     ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, CovarPop, Corr,
     RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2,
-    RegrSlope, RegrSXX, RegrSXY, StringAgg,
+    RegrSlope, RegrSXX, RegrSXY, StatFunc, StringAgg,
 )
 from django.db import connection
+from django.db.models.expressions import F, Value
 from django.test import TestCase
 from django.test.utils import Approximate
 
@@ -112,6 +113,31 @@ class TestGeneralAggregate(TestCase):
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestStatisticsAggregate(TestCase):
     fixtures = ["aggregation_general.json", "aggregation_statistics.json"]
+
+    # Tests for class base
+
+    def test_missing_arguments_raises_exception(self):
+        with self.assertRaisesMessage(TypeError, 'Both X and Y must be provided.'):
+            StatFunc(x=None, y=None)
+
+    def test_non_string_argument_raises_exception(self):
+        with self.assertRaisesMessage(ValueError, 'X and Y must be a string.'):
+            StatFunc(x='test', y=123)
+
+    def test_correct_source_expressions(self):
+        func = StatFunc(x='test', y='13')
+        self.assertTrue(isinstance(func.source_expressions[0], F))
+        self.assertTrue(isinstance(func.source_expressions[1], Value))
+
+    def test_correct_default_alias(self):
+        class SomeFunc(StatFunc):
+            name = 'TestFunc'
+        func = SomeFunc(x='foo', y='13')
+        self.assertEqual(func.default_alias, 'num_foo__testfunc')
+        func = SomeFunc(x='foo', y='bar')
+        self.assertEqual(func.default_alias, 'bar_foo__testfunc')
+
+    # Test aggregates
 
     def test_corr_general(self):
         values = StatTestModel.objects.all().aggregate(Corr(y='int2', x='int1'))
