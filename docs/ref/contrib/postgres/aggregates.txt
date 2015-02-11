@@ -1,8 +1,12 @@
+=========================================
 PostgreSQL specific aggregation functions
 =========================================
 
-All of these functions are available from the ``django.contrib.postgres.aggregates``
-module.
+.. module:: django.contrib.postgres.aggregates
+   :synopsis: PosgreSQL specific aggregation functions
+
+All of these functions are available
+from the ``django.contrib.postgres.aggregates``.
 
 General-purpose aggregation functions
 -------------------------------------

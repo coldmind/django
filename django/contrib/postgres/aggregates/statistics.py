@@ -3,9 +3,9 @@ from django.db.models.aggregates import Aggregate
 from django.db.models.expressions import Value
 from django.utils import six
 
-__all_ = [
+__all__ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
-    'RegrR2', 'RegrSlope', 'RegrSXX', 'RegrSXY', 'RegrSYY',
+    'RegrR2', 'RegrSlope', 'RegrSXX', 'RegrSXY', 'RegrSYY', 'StatFunc',
 ]
 
 

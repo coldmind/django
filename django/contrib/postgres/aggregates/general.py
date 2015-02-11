@@ -1,6 +1,6 @@
 from django.db.models.aggregates import Aggregate
 
-__all_ = [
+__all__ = [
     'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'StringAgg',
 ]
 
