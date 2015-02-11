@@ -15,7 +15,12 @@ from .models import GeneralTestModel, StatTestModel
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestGeneralAggregate(TestCase):
-    fixtures = ["aggregation_general.json"]
+    @classmethod
+    def setUpTestData(cls):
+        GeneralTestModel.objects.create(boolean_field=True, char_field='Foo1', integer_field=0)
+        GeneralTestModel.objects.create(boolean_field=False, char_field='Foo2', integer_field=1)
+        GeneralTestModel.objects.create(boolean_field=False, char_field='Foo3', integer_field=2)
+        GeneralTestModel.objects.create(boolean_field=True, char_field='Foo4', integer_field=0)
 
     def test_array_agg_charfield(self):
         values = GeneralTestModel.objects.aggregate(ArrayAgg('char_field'))
@@ -112,7 +117,23 @@ class TestGeneralAggregate(TestCase):
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestStatisticsAggregate(TestCase):
-    fixtures = ["aggregation_general.json", "aggregation_statistics.json"]
+    @classmethod
+    def setUpTestData(cls):
+        StatTestModel.objects.create(
+            int1=1,
+            int2=3,
+            related_field=GeneralTestModel.objects.create(integer_field=0)
+        )
+        StatTestModel.objects.create(
+            int1=2,
+            int2=2,
+            related_field=GeneralTestModel.objects.create(integer_field=1)
+        )
+        StatTestModel.objects.create(
+            int1=3,
+            int2=1,
+            related_field=GeneralTestModel.objects.create(integer_field=2)
+        )
 
     # Tests for class base
 

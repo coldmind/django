@@ -68,9 +68,9 @@ class GeneralTestModel(models.Model):
     """
     To test postgres-specific general aggregation functions
     """
-    char_field = models.CharField(max_length=30)
-    integer_field = models.IntegerField()
-    boolean_field = models.BooleanField()
+    char_field = models.CharField(max_length=30, blank=True)
+    integer_field = models.IntegerField(null=True)
+    boolean_field = models.NullBooleanField()
 
 
 class StatTestModel(models.Model):

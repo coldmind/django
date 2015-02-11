@@ -109,9 +109,9 @@ class Migration(migrations.Migration):
             name='GeneralTestModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('char_field', models.CharField(max_length=30)),
-                ('integer_field', models.IntegerField()),
-                ('boolean_field', models.BooleanField()),
+                ('boolean_field', models.NullBooleanField()),
+                ('char_field', models.CharField(max_length=30, blank=True)),
+                ('integer_field', models.IntegerField(null=True)),
             ]
         ),
         migrations.CreateModel(
