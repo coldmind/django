@@ -1,6 +1,5 @@
-from django.db.models import F, FloatField, IntegerField
+from django.db.models import FloatField, IntegerField
 from django.db.models.aggregates import Aggregate
-from django.db.models.expressions import Value
 from django.utils import six
 
 __all__ = [
