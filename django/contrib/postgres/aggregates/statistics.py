@@ -20,15 +20,6 @@ class StatFunc(Aggregate):
         self.y = y
         self.source_expressions = self._parse_expressions(self.y, self.x)
 
-    def _parse_expressions(self, *expressions):
-        # Some stat functions allows integer to be an argument,
-        # so we need to parse it and not resolve expression as F for
-        # this case.
-        return [
-            F(arg) if isinstance(arg, six.string_types) else Value(arg)
-            for arg in expressions
-        ]
-
     def get_source_expressions(self):
         return self.y, self.x
 
