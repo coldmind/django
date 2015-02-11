@@ -10,7 +10,6 @@ __all__ = [
 
 
 class StatFunc(Aggregate):
-    template = "%(function)s(%(y)s, %(x)s)"
     _num_expression_alias = 'num'
 
     def __init__(self, y, x, output_field=FloatField()):
@@ -19,37 +18,33 @@ class StatFunc(Aggregate):
         super(StatFunc, self).__init__(y=y, x=x, output_field=output_field)
         self.x = x
         self.y = y
-        self.source_expressions = self._parse_expressions(self.x, self.y)
+        self.source_expressions = self._parse_expressions(self.y, self.x)
 
     def _parse_expressions(self, *expressions):
         # Some stat functions allows integer to be an argument,
         # so we need to parse it and not resolve expression as F for
         # this case.
         return [
-            F(arg) if isinstance(arg, (six.string_types, six.text_type)) else Value(arg)
+            F(arg) if isinstance(arg, six.string_types) else Value(arg)
             for arg in expressions
         ]
+
+    def get_source_expressions(self):
+        return self.y, self.x
+
+    def set_source_expressions(self, exprs):
+        self.y, self.x = exprs
 
     @property
     def default_alias(self):
         # Since number is allowed to be an expression,
         # we need to have kinda "static" alias for this case.
-        x = self._num_expression_alias if not isinstance(self.x, (six.string_types, six.text_type)) else self.x
-        y = self._num_expression_alias if not isinstance(self.y, (six.string_types, six.text_type)) else self.y
+        x = self._num_expression_alias if not isinstance(self.x, six.string_types) else self.x
+        y = self._num_expression_alias if not isinstance(self.y, six.string_types) else self.y
         return '%s_%s__%s' % (y, x, self.name.lower())
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
-
-    def as_sql(self, compiler, connection, function=None, template=None):
-        sql_parts = []
-        params = []
-        for arg in self.source_expressions:
-            arg_sql, arg_params = compiler.compile(arg)
-            sql_parts.append(arg_sql)
-            params.extend(arg_params)
-        mapping = {'function': self.function, 'y': sql_parts[1], 'x': sql_parts[0]}
-        return self.template % mapping, params
 
 
 class Corr(StatFunc):

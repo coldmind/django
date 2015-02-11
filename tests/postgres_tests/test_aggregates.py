@@ -122,8 +122,8 @@ class TestStatisticsAggregate(TestCase):
 
     def test_correct_source_expressions(self):
         func = StatFunc(x='test', y=13)
-        self.assertTrue(isinstance(func.source_expressions[0], F))
-        self.assertTrue(isinstance(func.source_expressions[1], Value))
+        self.assertTrue(isinstance(func.source_expressions[0], Value))
+        self.assertTrue(isinstance(func.source_expressions[1], F))
 
     def test_correct_default_alias(self):
         class SomeFunc(StatFunc):
