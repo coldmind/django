@@ -3,7 +3,7 @@ import unittest
 from django.contrib.postgres.aggregates import (
     ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, RegrAvgX,
     RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope, RegrSXX, RegrSXY,
-    RegrSYY, StatFunc, StringAgg,
+    RegrSYY, StatAggregate, StringAgg,
 )
 from django.db import connection
 from django.db.models.expressions import F, Value
@@ -23,96 +23,96 @@ class TestGeneralAggregate(TestCase):
         GeneralTestModel.objects.create(boolean_field=True, char_field='Foo4', integer_field=0)
 
     def test_array_agg_charfield(self):
-        values = GeneralTestModel.objects.aggregate(ArrayAgg('char_field'))
-        self.assertEqual(values, {'char_field__arrayagg': ['Foo1', 'Foo2', 'Foo3', 'Foo4']})
+        values = GeneralTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field'))
+        self.assertEqual(values, {'arrayagg': ['Foo1', 'Foo2', 'Foo3', 'Foo4']})
 
     def test_array_agg_integerfield(self):
-        values = GeneralTestModel.objects.aggregate(ArrayAgg('integer_field'))
-        self.assertEqual(values, {'integer_field__arrayagg': [0, 1, 2, 0]})
+        values = GeneralTestModel.objects.aggregate(arrayagg=ArrayAgg('integer_field'))
+        self.assertEqual(values, {'arrayagg': [0, 1, 2, 0]})
 
     def test_array_agg_booleanfield(self):
-        values = GeneralTestModel.objects.aggregate(ArrayAgg('boolean_field'))
-        self.assertEqual(values, {'boolean_field__arrayagg': [True, False, False, True]})
+        values = GeneralTestModel.objects.aggregate(arrayagg=ArrayAgg('boolean_field'))
+        self.assertEqual(values, {'arrayagg': [True, False, False, True]})
 
     def test_array_agg_empty_result(self):
         GeneralTestModel.objects.all().delete()
-        values = GeneralTestModel.objects.aggregate(ArrayAgg('char_field'))
-        self.assertEqual(values, {'char_field__arrayagg': []})
-        values = GeneralTestModel.objects.aggregate(ArrayAgg('integer_field'))
-        self.assertEqual(values, {'integer_field__arrayagg': []})
-        values = GeneralTestModel.objects.aggregate(ArrayAgg('boolean_field'))
-        self.assertEqual(values, {'boolean_field__arrayagg': []})
+        values = GeneralTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field'))
+        self.assertEqual(values, {'arrayagg': []})
+        values = GeneralTestModel.objects.aggregate(arrayagg=ArrayAgg('integer_field'))
+        self.assertEqual(values, {'arrayagg': []})
+        values = GeneralTestModel.objects.aggregate(arrayagg=ArrayAgg('boolean_field'))
+        self.assertEqual(values, {'arrayagg': []})
 
     def test_bit_and_general(self):
         values = GeneralTestModel.objects.filter(
-            integer_field__in=[0, 1]).aggregate(BitAnd('integer_field'))
-        self.assertEqual(values, {'integer_field__bitand': 0})
+            integer_field__in=[0, 1]).aggregate(bitand=BitAnd('integer_field'))
+        self.assertEqual(values, {'bitand': 0})
 
     def test_bit_and_on_only_true_values(self):
         values = GeneralTestModel.objects.filter(
-            integer_field=1).aggregate(BitAnd('integer_field'))
-        self.assertEqual(values, {'integer_field__bitand': 1})
+            integer_field=1).aggregate(bitand=BitAnd('integer_field'))
+        self.assertEqual(values, {'bitand': 1})
 
     def test_bit_and_on_only_false_values(self):
         values = GeneralTestModel.objects.filter(
-            integer_field=0).aggregate(BitAnd('integer_field'))
-        self.assertEqual(values, {'integer_field__bitand': 0})
+            integer_field=0).aggregate(bitand=BitAnd('integer_field'))
+        self.assertEqual(values, {'bitand': 0})
 
     def test_bit_and_empty_result(self):
         GeneralTestModel.objects.all().delete()
-        values = GeneralTestModel.objects.aggregate(BitAnd('integer_field'))
-        self.assertEqual(values, {'integer_field__bitand': None})
+        values = GeneralTestModel.objects.aggregate(bitand=BitAnd('integer_field'))
+        self.assertEqual(values, {'bitand': None})
 
     def test_bit_or_general(self):
         values = GeneralTestModel.objects.filter(
-            integer_field__in=[0, 1]).aggregate(BitOr('integer_field'))
-        self.assertEqual(values, {'integer_field__bitor': 1})
+            integer_field__in=[0, 1]).aggregate(bitor=BitOr('integer_field'))
+        self.assertEqual(values, {'bitor': 1})
 
     def test_bit_or_on_only_true_values(self):
         values = GeneralTestModel.objects.filter(
-            integer_field=1).aggregate(BitOr('integer_field'))
-        self.assertEqual(values, {'integer_field__bitor': 1})
+            integer_field=1).aggregate(bitor=BitOr('integer_field'))
+        self.assertEqual(values, {'bitor': 1})
 
     def test_bit_or_on_only_false_values(self):
         values = GeneralTestModel.objects.filter(
-            integer_field=0).aggregate(BitOr('integer_field'))
-        self.assertEqual(values, {'integer_field__bitor': 0})
+            integer_field=0).aggregate(bitor=BitOr('integer_field'))
+        self.assertEqual(values, {'bitor': 0})
 
     def test_bit_or_empty_result(self):
         GeneralTestModel.objects.all().delete()
-        values = GeneralTestModel.objects.aggregate(BitOr('integer_field'))
-        self.assertEqual(values, {'integer_field__bitor': None})
+        values = GeneralTestModel.objects.aggregate(bitor=BitOr('integer_field'))
+        self.assertEqual(values, {'bitor': None})
 
     def test_bool_and_general(self):
-        values = GeneralTestModel.objects.aggregate(BoolAnd('boolean_field'))
-        self.assertEqual(values, {'boolean_field__booland': False})
+        values = GeneralTestModel.objects.aggregate(booland=BoolAnd('boolean_field'))
+        self.assertEqual(values, {'booland': False})
 
     def test_bool_and_empty_result(self):
         GeneralTestModel.objects.all().delete()
-        values = GeneralTestModel.objects.aggregate(BoolAnd('boolean_field'))
-        self.assertEqual(values, {'boolean_field__booland': None})
+        values = GeneralTestModel.objects.aggregate(booland=BoolAnd('boolean_field'))
+        self.assertEqual(values, {'booland': None})
 
     def test_bool_or_general(self):
-        values = GeneralTestModel.objects.aggregate(BoolOr('boolean_field'))
-        self.assertEqual(values, {'boolean_field__boolor': True})
+        values = GeneralTestModel.objects.aggregate(boolor=BoolOr('boolean_field'))
+        self.assertEqual(values, {'boolor': True})
 
     def test_bool_or_empty_result(self):
         GeneralTestModel.objects.all().delete()
-        values = GeneralTestModel.objects.aggregate(BoolOr('boolean_field'))
-        self.assertEqual(values, {'boolean_field__boolor': None})
+        values = GeneralTestModel.objects.aggregate(boolor=BoolOr('boolean_field'))
+        self.assertEqual(values, {'boolor': None})
 
     def test_string_agg_requires_delimiter(self):
-        with self.assertRaises(TypeError):
-            GeneralTestModel.objects.aggregate(StringAgg('char_field'))
+        with self.assertRaisesMessage(TypeError, 'STRING_AGG function requires a delimiter.'):
+            GeneralTestModel.objects.aggregate(stringagg=StringAgg('char_field'))
 
     def test_string_agg_charfield(self):
-        values = GeneralTestModel.objects.aggregate(StringAgg('char_field', delimiter=';'))
-        self.assertEqual(values, {'char_field__stringagg': 'Foo1;Foo2;Foo3;Foo4'})
+        values = GeneralTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
+        self.assertEqual(values, {'stringagg': 'Foo1;Foo2;Foo3;Foo4'})
 
     def test_string_agg_empty_result(self):
         GeneralTestModel.objects.all().delete()
-        values = GeneralTestModel.objects.aggregate(StringAgg('char_field', delimiter=';'))
-        self.assertEqual(values, {'char_field__stringagg': None})
+        values = GeneralTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
+        self.assertEqual(values, {'stringagg': None})
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -138,136 +138,134 @@ class TestStatisticsAggregate(TestCase):
     # Tests for class base
 
     def test_missing_arguments_raises_exception(self):
-        with self.assertRaisesMessage(TypeError, 'Both X and Y must be provided.'):
-            StatFunc(x=None, y=None)
+        with self.assertRaisesMessage(ValueError, 'Both X and Y must be provided.'):
+            StatAggregate(x=None, y=None)
 
     def test_correct_source_expressions(self):
-        func = StatFunc(x='test', y=13)
+        func = StatAggregate(x='test', y=13)
         self.assertTrue(isinstance(func.source_expressions[0], Value))
         self.assertTrue(isinstance(func.source_expressions[1], F))
 
-    def test_correct_default_alias(self):
-        class SomeFunc(StatFunc):
-            name = 'TestFunc'
-        func = SomeFunc(x='foo', y=13)
-        self.assertEqual(func.default_alias, 'num_foo__testfunc')
-        func = SomeFunc(x='foo', y='bar')
-        self.assertEqual(func.default_alias, 'bar_foo__testfunc')
+    def test_alias_is_required(self):
+        class SomeFunc(StatAggregate):
+            function = 'TEST'
+        with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
+            StatTestModel.objects.aggregate(SomeFunc(y='int2', x='int1'))
 
     # Test aggregates
 
     def test_corr_general(self):
-        values = StatTestModel.objects.aggregate(Corr(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__corr': -1.0})
+        values = StatTestModel.objects.aggregate(corr=Corr(y='int2', x='int1'))
+        self.assertEqual(values, {'corr': -1.0})
 
     def test_corr_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(Corr(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__corr': None})
+        values = StatTestModel.objects.aggregate(corr=Corr(y='int2', x='int1'))
+        self.assertEqual(values, {'corr': None})
 
     def test_covar_pop_general(self):
-        values = StatTestModel.objects.aggregate(CovarPop(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__covarpop': Approximate(-0.66, places=1)})
+        values = StatTestModel.objects.aggregate(covarpop=CovarPop(y='int2', x='int1'))
+        self.assertEqual(values, {'covarpop': Approximate(-0.66, places=1)})
 
     def test_covar_pop_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(CovarPop(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__covarpop': None})
+        values = StatTestModel.objects.aggregate(covarpop=CovarPop(y='int2', x='int1'))
+        self.assertEqual(values, {'covarpop': None})
 
     def test_covar_pop_sample(self):
-        values = StatTestModel.objects.aggregate(CovarPop(y='int2', x='int1', sample=True))
-        self.assertEqual(values, {'int2_int1__covarpop': -1.0})
+        values = StatTestModel.objects.aggregate(covarpop=CovarPop(y='int2', x='int1', sample=True))
+        self.assertEqual(values, {'covarpop': -1.0})
 
     def test_covar_pop_sample_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(CovarPop(y='int2', x='int1', sample=True))
-        self.assertEqual(values, {'int2_int1__covarpop': None})
+        values = StatTestModel.objects.aggregate(covarpop=CovarPop(y='int2', x='int1', sample=True))
+        self.assertEqual(values, {'covarpop': None})
 
     def test_regr_avgx_general(self):
-        values = StatTestModel.objects.aggregate(RegrAvgX(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regravgx': 2.0})
+        values = StatTestModel.objects.aggregate(regravgx=RegrAvgX(y='int2', x='int1'))
+        self.assertEqual(values, {'regravgx': 2.0})
 
     def test_regr_avgx_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrAvgX(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regravgx': None})
+        values = StatTestModel.objects.aggregate(regravgx=RegrAvgX(y='int2', x='int1'))
+        self.assertEqual(values, {'regravgx': None})
 
     def test_regr_avgy_general(self):
-        values = StatTestModel.objects.aggregate(RegrAvgY(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regravgy': 2.0})
+        values = StatTestModel.objects.aggregate(regravgy=RegrAvgY(y='int2', x='int1'))
+        self.assertEqual(values, {'regravgy': 2.0})
 
     def test_regr_avgy_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrAvgY(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regravgy': None})
+        values = StatTestModel.objects.aggregate(regravgy=RegrAvgY(y='int2', x='int1'))
+        self.assertEqual(values, {'regravgy': None})
 
     def test_regr_count_general(self):
-        values = StatTestModel.objects.aggregate(RegrCount(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrcount': 3})
+        values = StatTestModel.objects.aggregate(regrcount=RegrCount(y='int2', x='int1'))
+        self.assertEqual(values, {'regrcount': 3})
 
     def test_regr_count_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrCount(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrcount': 0})
+        values = StatTestModel.objects.aggregate(regrcount=RegrCount(y='int2', x='int1'))
+        self.assertEqual(values, {'regrcount': 0})
 
     def test_regr_intercept_general(self):
-        values = StatTestModel.objects.aggregate(RegrIntercept(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrintercept': 4})
+        values = StatTestModel.objects.aggregate(regrintercept=RegrIntercept(y='int2', x='int1'))
+        self.assertEqual(values, {'regrintercept': 4})
 
     def test_regr_intercept_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrIntercept(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrintercept': None})
+        values = StatTestModel.objects.aggregate(regrintercept=RegrIntercept(y='int2', x='int1'))
+        self.assertEqual(values, {'regrintercept': None})
 
     def test_regr_r2_general(self):
-        values = StatTestModel.objects.aggregate(RegrR2(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrr2': 1})
+        values = StatTestModel.objects.aggregate(regrr2=RegrR2(y='int2', x='int1'))
+        self.assertEqual(values, {'regrr2': 1})
 
     def test_regr_r2_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrR2(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrr2': None})
+        values = StatTestModel.objects.aggregate(regrr2=RegrR2(y='int2', x='int1'))
+        self.assertEqual(values, {'regrr2': None})
 
     def test_regr_slope_general(self):
-        values = StatTestModel.objects.aggregate(RegrSlope(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrslope': -1})
+        values = StatTestModel.objects.aggregate(regrslope=RegrSlope(y='int2', x='int1'))
+        self.assertEqual(values, {'regrslope': -1})
 
     def test_regr_slope_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrSlope(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrslope': None})
+        values = StatTestModel.objects.aggregate(regrslope=RegrSlope(y='int2', x='int1'))
+        self.assertEqual(values, {'regrslope': None})
 
     def test_regr_sxx_general(self):
-        values = StatTestModel.objects.aggregate(RegrSXX(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrsxx': 2.0})
+        values = StatTestModel.objects.aggregate(regrsxx=RegrSXX(y='int2', x='int1'))
+        self.assertEqual(values, {'regrsxx': 2.0})
 
     def test_regr_sxx_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrSXX(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrsxx': None})
+        values = StatTestModel.objects.aggregate(regrsxx=RegrSXX(y='int2', x='int1'))
+        self.assertEqual(values, {'regrsxx': None})
 
     def test_regr_sxy_general(self):
-        values = StatTestModel.objects.aggregate(RegrSXY(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrsxy': -2.0})
+        values = StatTestModel.objects.aggregate(regrsxy=RegrSXY(y='int2', x='int1'))
+        self.assertEqual(values, {'regrsxy': -2.0})
 
     def test_regr_sxy_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrSXY(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrsxy': None})
+        values = StatTestModel.objects.aggregate(regrsxy=RegrSXY(y='int2', x='int1'))
+        self.assertEqual(values, {'regrsxy': None})
 
     def test_regr_syy_general(self):
-        values = StatTestModel.objects.aggregate(RegrSYY(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrsyy': 2.0})
+        values = StatTestModel.objects.aggregate(regrsyy=RegrSYY(y='int2', x='int1'))
+        self.assertEqual(values, {'regrsyy': 2.0})
 
     def test_regr_syy_empty_result(self):
         StatTestModel.objects.all().delete()
-        values = StatTestModel.objects.aggregate(RegrSYY(y='int2', x='int1'))
-        self.assertEqual(values, {'int2_int1__regrsyy': None})
+        values = StatTestModel.objects.aggregate(regrsyy=RegrSYY(y='int2', x='int1'))
+        self.assertEqual(values, {'regrsyy': None})
 
     def test_regr_avgx_with_related_obj_and_number_as_argument(self):
         """
         This is more complex test to check if JOIN on field and
         number as argument works as expected.
         """
-        values = StatTestModel.objects.aggregate(RegrAvgX(y=5, x='related_field__integer_field'))
-        self.assertEqual(values, {'num_related_field__integer_field__regravgx': 1.0})
+        values = StatTestModel.objects.aggregate(complex_regravgx=RegrAvgX(y=5, x='related_field__integer_field'))
+        self.assertEqual(values, {'complex_regravgx': 1.0})

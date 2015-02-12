@@ -8,6 +8,12 @@ PostgreSQL specific aggregation functions
 All of these functions are available
 from the ``django.contrib.postgres.aggregates``.
 
+.. warning::
+
+    All functions come without default alias,
+    so you must explicitly provide it.
+
+
 General-purpose aggregation functions
 -------------------------------------
 
@@ -18,7 +24,6 @@ ArrayAgg
 
     Returns input values, including nulls, concatenated into an array.
 
-    * Default alias: ``<field>__arrayagg``
     * Return type: ``list``
 
 BitAnd
@@ -28,7 +33,6 @@ BitAnd
 
     Returns the bitwise AND of all non-null input values, or null if none.
 
-    * Default alias: ``<field>__bitand``
     * Return type: ``int`` or ``None``
 
 BitOr
@@ -38,7 +42,6 @@ BitOr
 
     Returns the bitwise OR of all non-null input values, or null if none.
 
-    * Default alias: ``<field>__bitor``
     * Return type: ``int`` or ``None``
 
 BoolAnd
@@ -48,7 +51,6 @@ BoolAnd
 
     Returns ``True``, if all input values are true, otherwise ``False``.
 
-    * Default alias: ``<field>__booland``
     * Return type: ``bool`` or ``None``
 
 BoolOr
@@ -58,7 +60,6 @@ BoolOr
 
     Returns ``True`` if at least one input value is true, otherwise ``False``.
 
-    * Default alias: ``<field>__boolor``
     * Return type: ``bool`` or ``None``
 
 
@@ -69,7 +70,6 @@ StringAgg
 
     Returns input values concatenated into a string, separated by delimiter.
 
-    * Default alias: ``<field>__stringagg``
     * Return type: ``str`` or ``None``
 
     .. attribute:: delimiter
@@ -83,17 +83,9 @@ Aggregate functions for statistics
 ``x`` and ``y``
 ~~~~~~~~~~~~~~~
 
-Both of ``x`` and ``y`` can be a string with field name or integer.
-If passed argument is a field name, it will be displayed in alias
-as is.
-If passed argument is an integer, ``num`` will be displayed in
-alias at this place.
+Both of ``x`` and ``y`` can be a string with field name or an expression
+returning an integer, and both must to be provided.
 
-Example::
-
-    >> func = SomeStatFunc(y='field_name', x=13)
-    >> print(func.default_alias)
-    'field_name_num__somestatfunc'
 
 Corr
 ~~~~
@@ -102,7 +94,6 @@ Corr
 
     Returns correlation coefficient.
 
-    * Default alias: ``<y>_<x>__corr``
     * Return type: ``float`` or ``None``
 
 CovarPop
@@ -112,7 +103,6 @@ CovarPop
 
     Returns population covariance.
 
-    * Default alias: ``<y>_<x>__covarpop``
     * Return type: ``float`` or ``None``
 
     Has one optional argument:
@@ -129,7 +119,6 @@ RegrAvgX
 
     Returns average of the independent variable (``sum(x)/N``).
 
-    * Default alias: ``<y>_<x>__regravgx``
     * Return type: ``float`` or ``None``
 
 RegrAvgY
@@ -139,7 +128,6 @@ RegrAvgY
 
     Returns average of the independent variable (``sum(y)/N``).
 
-    * Default alias: ``<y>_<x>__regravgy``
     * Return type: ``float`` or ``None``
 
 RegrCount
@@ -149,7 +137,6 @@ RegrCount
 
     Returns number of input rows in which both expressions are not null.
 
-    * Default alias: ``<y>_<x>__regrcount``
     * Return type: ``int``
 
 RegrIntercept
@@ -160,7 +147,6 @@ RegrIntercept
     Returns y-intercept of the least-squares-fit linear equation determined
     by the ``(x, y)`` pairs.
 
-    * Default alias: ``<y>_<x>__regrintercept``
     * Return type: ``float`` or ``None``
 
 RegrR2
@@ -170,7 +156,6 @@ RegrR2
 
     Returns square of the correlation coefficient.
 
-    * Default alias: ``<y>_<x>__regrr2``
     * Return type: ``float`` or ``None``
 
 RegrSlope
@@ -181,7 +166,6 @@ RegrSlope
     Returns slope of the least-squares-fit linear equation determined
     by the ``(x, y)`` pairs.
 
-    * Default alias: ``<y>_<x>__regrslope``
     * Return type: ``float`` or ``None``
 
 RegrSXX
@@ -191,7 +175,6 @@ RegrSXX
 
     Returns ``sum(x^2) - sum(x)^2/N`` ("sum of squares" of the independent variable).
 
-    * Default alias: ``<y>_<x>__regrsxx``
     * Return type: ``float`` or ``None``
 
 RegrSXY
@@ -202,7 +185,6 @@ RegrSXY
     Returns ``sum(x*y) - sum(x) * sum(y)/N`` ("sum of products" of independent
     times dependent variable).
 
-    * Default alias: ``<y>_<x>__regrsxy``
     * Return type: ``float`` or ``None``
 
 RegrSYY
@@ -212,5 +194,4 @@ RegrSYY
 
     Returns ``sum(y^2) - sum(y)^2/N`` ("sum of squares" of the dependent variable).
 
-    * Default alias: ``<y>_<x>__regrsyy``
     * Return type: ``float`` or ``None``

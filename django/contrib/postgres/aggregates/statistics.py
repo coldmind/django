@@ -1,20 +1,17 @@
 from django.db.models import FloatField, IntegerField
 from django.db.models.aggregates import Aggregate
-from django.utils import six
 
 __all__ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
-    'RegrR2', 'RegrSlope', 'RegrSXX', 'RegrSXY', 'RegrSYY', 'StatFunc',
+    'RegrR2', 'RegrSlope', 'RegrSXX', 'RegrSXY', 'RegrSYY', 'StatAggregate',
 ]
 
 
-class StatFunc(Aggregate):
-    _num_expression_alias = 'num'
-
+class StatAggregate(Aggregate):
     def __init__(self, y, x, output_field=FloatField()):
         if not x or not y:
-            raise TypeError('Both X and Y must be provided.')
-        super(StatFunc, self).__init__(y=y, x=x, output_field=output_field)
+            raise ValueError('Both X and Y must be provided.')
+        super(StatAggregate, self).__init__(y=y, x=x, output_field=output_field)
         self.x = x
         self.y = y
         self.source_expressions = self._parse_expressions(self.y, self.x)
@@ -25,44 +22,30 @@ class StatFunc(Aggregate):
     def set_source_expressions(self, exprs):
         self.y, self.x = exprs
 
-    @property
-    def default_alias(self):
-        # Since number is allowed to be an expression,
-        # we need to have kinda "static" alias for this case.
-        x = self._num_expression_alias if not isinstance(self.x, six.string_types) else self.x
-        y = self._num_expression_alias if not isinstance(self.y, six.string_types) else self.y
-        return '%s_%s__%s' % (y, x, self.name.lower())
-
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
 
 
-class Corr(StatFunc):
+class Corr(StatAggregate):
     function = 'CORR'
-    name = 'Corr'
 
 
-class CovarPop(StatFunc):
-    name = 'CovarPop'
-
+class CovarPop(StatAggregate):
     def __init__(self, y, x, sample=False):
         self.function = 'COVAR_SAMP' if sample else 'COVAR_POP'
         super(CovarPop, self).__init__(y, x)
 
 
-class RegrAvgX(StatFunc):
+class RegrAvgX(StatAggregate):
     function = 'REGR_AVGX'
-    name = 'RegrAvgX'
 
 
-class RegrAvgY(StatFunc):
+class RegrAvgY(StatAggregate):
     function = 'REGR_AVGY'
-    name = 'RegrAvgY'
 
 
-class RegrCount(StatFunc):
+class RegrCount(StatAggregate):
     function = 'REGR_COUNT'
-    name = 'RegrCount'
 
     def __init__(self, y, x):
         super(RegrCount, self).__init__(y=y, x=x, output_field=IntegerField())
@@ -73,31 +56,25 @@ class RegrCount(StatFunc):
         return int(value)
 
 
-class RegrIntercept(StatFunc):
+class RegrIntercept(StatAggregate):
     function = 'REGR_INTERCEPT'
-    name = 'RegrIntercept'
 
 
-class RegrR2(StatFunc):
+class RegrR2(StatAggregate):
     function = 'REGR_R2'
-    name = 'RegrR2'
 
 
-class RegrSlope(StatFunc):
+class RegrSlope(StatAggregate):
     function = 'REGR_SLOPE'
-    name = 'RegrSlope'
 
 
-class RegrSXX(StatFunc):
+class RegrSXX(StatAggregate):
     function = 'REGR_SXX'
-    name = 'RegrSXX'
 
 
-class RegrSXY(StatFunc):
+class RegrSXY(StatAggregate):
     function = 'REGR_SXY'
-    name = 'RegrSXY'
 
 
-class RegrSYY(StatFunc):
+class RegrSYY(StatAggregate):
     function = 'REGR_SYY'
-    name = 'RegrSYY'

@@ -7,7 +7,6 @@ __all__ = [
 
 class ArrayAgg(Aggregate):
     function = 'ARRAY_AGG'
-    name = 'ArrayAgg'
 
     def convert_value(self, value, connection, context):
         if not value:
@@ -17,27 +16,22 @@ class ArrayAgg(Aggregate):
 
 class BitAnd(Aggregate):
     function = 'BIT_AND'
-    name = 'BitAnd'
 
 
 class BitOr(Aggregate):
     function = 'BIT_OR'
-    name = 'BitOr'
 
 
 class BoolAnd(Aggregate):
     function = 'BOOL_AND'
-    name = 'BoolAnd'
 
 
 class BoolOr(Aggregate):
     function = 'BOOL_OR'
-    name = 'BoolOr'
 
 
 class StringAgg(Aggregate):
     function = 'STRING_AGG'
-    name = 'StringAgg'
     template = "%(function)s(%(expressions)s, '%(delimiter)s')"
 
     def __init__(self, *expressions, **extra):
