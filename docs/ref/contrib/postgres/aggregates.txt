@@ -10,8 +10,13 @@ from the ``django.contrib.postgres.aggregates``.
 
 .. warning::
 
-    All functions come without default alias,
+    All functions come without default aliases,
     so you must explicitly provide it.
+    Usage example::
+
+        >> result = SomeModel.objects.aggregate(arr=ArrayAgg('somefield'))
+        >> print(result)
+        {'arr': [0, 1, 2]}
 
 
 General-purpose aggregation functions
@@ -31,7 +36,7 @@ BitAnd
 
 .. class:: BitAnd(expression, **extra)
 
-    Returns the bitwise AND of all non-null input values, or null if none.
+    Returns the bitwise ``AND`` of all non-null input values, or ``NULL`` if none.
 
     * Return type: ``int`` or ``None``
 
@@ -40,7 +45,7 @@ BitOr
 
 .. class:: BitOr(expression, **extra)
 
-    Returns the bitwise OR of all non-null input values, or null if none.
+    Returns the bitwise ``OR`` of all non-null input values, or ``NULL`` if none.
 
     * Return type: ``int`` or ``None``
 
@@ -84,7 +89,7 @@ Aggregate functions for statistics
 ~~~~~~~~~~~~~~~
 
 Both of ``x`` and ``y`` can be a string with field name or an expression
-returning an integer, and both must to be provided.
+returning a numeric data, and both must to be provided.
 
 
 Corr
