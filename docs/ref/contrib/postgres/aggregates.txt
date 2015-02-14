@@ -85,10 +85,10 @@ StringAgg
 Aggregate functions for statistics
 ----------------------------------
 
-``x`` and ``y``
+``y`` and ``x``
 ~~~~~~~~~~~~~~~
 
-Both of ``x`` and ``y`` can be a string with field name or an expression
+Both of ``y`` and ``x`` can be a string with field name or an expression
 returning a numeric data, and both must to be provided.
 
 
@@ -200,3 +200,36 @@ RegrSYY
     Returns ``sum(y^2) - sum(y)^2/N`` ("sum of squares" of the dependent variable).
 
     * Return type: ``float`` or ``None``
+
+
+Usage examples
+--------------
+
+We will use this example table::
+
+    | FIELD1 | FIELD2 | FIELD3 |
+    |--------|--------|--------|
+    |    foo |      1 |     13 |
+    |    bar |      2 | (null) |
+    |   test |      3 |     13 |
+
+
+Usage of some general-purpose aggregation functions::
+
+    >> TestModel.objects.aggregate(result=StringAgg('field1', delimiter=';'))
+    {'result': 'foo;bar;test'}
+    >> TestModel.objects.aggregate(result=ArrayAgg('field2'))
+    {'result': [1, 2, 3]}
+    >> TestModel.objects.aggregate(result=ArrayAgg('field1'))
+    {'result': ['foo', 'bar', 'test']}
+
+Next example is about usage of statistics aggregation functions.
+Underlying math will be not described (you can read about this,
+for example, at `wikipedia page <http://en.wikipedia.org/wiki/Regression_analysis>`_)::
+
+    >> TestModel.objects.aggregate(count=RegrCount(y='field3', x='field2'))
+    {'count': 2}
+    >> TestModel.objects.aggregate(
+    avgx=RegrAvgX(y='field3', x='field2'), avgy=RegrAvgY(y='field3', x='field2')
+    )
+    {'avgx': 2, 'avgy': 13}
