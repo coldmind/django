@@ -1,11 +1,8 @@
-import unittest
-
 from django.contrib.postgres.aggregates import (
     ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, RegrAvgX,
     RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope, RegrSXX, RegrSXY,
     RegrSYY, StatAggregate, StringAgg,
 )
-from django.db import connection
 from django.db.models.expressions import F, Value
 from django.test import TestCase
 from django.test.utils import Approximate
@@ -13,7 +10,6 @@ from django.test.utils import Approximate
 from .models import GeneralTestModel, StatTestModel
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestGeneralAggregate(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -115,7 +111,6 @@ class TestGeneralAggregate(TestCase):
         self.assertEqual(values, {'stringagg': None})
 
 
-@unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
 class TestStatisticsAggregate(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -267,5 +262,6 @@ class TestStatisticsAggregate(TestCase):
         This is more complex test to check if JOIN on field and
         number as argument works as expected.
         """
+        import ipdb; ipdb.set_trace()
         values = StatTestModel.objects.aggregate(complex_regravgx=RegrAvgX(y=5, x='related_field__integer_field'))
         self.assertEqual(values, {'complex_regravgx': 1.0})
