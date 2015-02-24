@@ -262,6 +262,5 @@ class TestStatisticsAggregate(TestCase):
         This is more complex test to check if JOIN on field and
         number as argument works as expected.
         """
-        import ipdb; ipdb.set_trace()
         values = StatTestModel.objects.aggregate(complex_regravgx=RegrAvgX(y=5, x='related_field__integer_field'))
         self.assertEqual(values, {'complex_regravgx': 1.0})
