@@ -169,6 +169,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.introspection = DatabaseIntrospection(self)
         self.validation = BaseDatabaseValidation(self)
 
+    def _cursor(self):
+        self.ensure_connection()
+        with self.wrap_database_errors:
+            cursor = self.create_cursor()
+        cursor.execute("PRAGMA foreign_keys = ON")
+        return cursor
+
     def get_connection_params(self):
         settings_dict = self.settings_dict
         if not settings_dict['NAME']:
@@ -286,7 +293,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         % (table_name, bad_row[0], table_name, column_name, bad_row[1],
                         referenced_table_name, referenced_column_name))
 
+    def disable_constraint_checking(self):
+        self.cursor().execute("PRAGMA foreign_keys = OFF")
+
+    def enable_constraint_checking(self):
+        self.cursor().execute("PRAGMA foreign_keys = ON")
+
     def is_usable(self):
+        return True
+
+    def _are_fk_constraints_supported(self, cursor):
+        cursor.execute("PRAGMA foreign_keys")
+        result = cursor.fetchone()
+        if result is None:
+            return False
         return True
 
     def _start_transaction_under_autocommit(self):

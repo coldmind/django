@@ -88,6 +88,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "django_datetime_trunc('%s', %s, %%s)" % (
             lookup_type.lower(), field_name), [tzname]
 
+    def deferrable_sql(self):
+        return " DEFERRABLE INITIALLY DEFERRED"
+
     def drop_foreignkey_sql(self):
         return ""
 
